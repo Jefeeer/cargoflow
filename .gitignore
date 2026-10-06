@@ -9,3 +9,7 @@ server/data/*.db-*
 .env.local
 !.env.example
 *.tsbuildinfo
+
+# Next.js
+.next/
+next-env.d.ts

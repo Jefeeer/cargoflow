@@ -1,36 +1,25 @@
-import { PROCESS } from '@/lib/content';
-import { Reveal } from '@/components/shared/Reveal';
-import { SectionHeader } from '@/components/shared/SectionHeader';
+import { Reveal } from '@/components/ui/Reveal';
+import { SectionLabel } from '@/components/ui/SectionLabel';
+import { ProcessRoute } from './ProcessRoute';
 
 export function Process() {
   return (
-    <section className="section bg-ink-900">
-      <div className="container-cf">
-        <Reveal>
-          <SectionHeader kicker="The Process" heading="How CargoFlow Works" align="center" className="mx-auto" />
+    <section id="process" className="bg-paper-2 py-24 sm:py-32">
+      <div className="shell">
+        <Reveal className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <SectionLabel index="04">The process</SectionLabel>
+            <h2 className="mt-6 t-h2">
+              How CargoFlow works.
+            </h2>
+          </div>
+          <p className="self-end text-lg leading-relaxed text-mute lg:col-span-4 lg:col-start-9">
+            Four stops from first message to confirmed delivery, with clear communication at each one.
+          </p>
         </Reveal>
-
-        <ol className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {PROCESS.map((step, i) => (
-            <Reveal key={step.number} delay={i * 0.1} as="li">
-              <div className="relative">
-                <span className="font-display text-4xl font-bold text-signal-500/30">{step.number}</span>
-                <h3 className="mt-3 font-display text-lg text-white">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-steel-300">{step.body}</p>
-                <ul className="mt-4 space-y-1.5">
-                  {step.points.map((p) => (
-                    <li key={p} className="text-xs font-mono text-steel-500">
-                      &middot; {p}
-                    </li>
-                  ))}
-                </ul>
-                {i < PROCESS.length - 1 && (
-                  <div className="mt-6 hidden h-px w-full bg-gradient-to-r from-signal-500/40 to-transparent sm:block lg:hidden" />
-                )}
-              </div>
-            </Reveal>
-          ))}
-        </ol>
+        <div className="mt-16 lg:mt-20">
+          <ProcessRoute />
+        </div>
       </div>
     </section>
   );

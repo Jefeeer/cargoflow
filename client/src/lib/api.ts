@@ -9,7 +9,8 @@ import type {
   QuoteResponse,
 } from './types';
 
-const baseURL = import.meta.env.VITE_API_URL?.trim() || '';
+// Empty base = same origin; next.config.ts proxies /api/* to the Express server.
+const baseURL = process.env.NEXT_PUBLIC_API_URL?.trim() || '';
 
 const client = axios.create({
   baseURL,

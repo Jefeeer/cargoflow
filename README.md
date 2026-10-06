@@ -15,14 +15,16 @@ This is a marketing + lead-gen site. The primary conversion action everywhere is
 
 ## Highlights
 
-- **Premium B2B logistics identity** — deep-navy foundations, orange "signal" accents,
-  Space Grotesk / Inter typography, technical grid detailing.
-- **Interactive 3D Miami logistics network** (Three.js / React Three Fiber) behind the
-  hero and in the network section — glowing Miami hub, animated route arcs, traveling
-  shipment dots, subtle camera drift + mouse parallax.
-- **Graceful 3D degradation** — lazy-loaded canvas; automatic SVG/CSS fallback for
-  `prefers-reduced-motion`, missing WebGL, or small/low-power screens. The site is fully
-  usable with no 3D at all.
+- **"Airside" identity** — a visual language borrowed from airfield signage (black-on-yellow
+  direction signs, yellow-on-black location signs) and air-cargo paperwork. Warm paper,
+  ink black, signal yellow; Archivo (variable width axis) for display and IBM Plex Mono for
+  data labels.
+- **Signature visuals, all hand-built SVG/CSS (no WebGL):** a split-flap departures board
+  in the hero, a taxiway-style sign array as service navigation, an engineering drawing of
+  a turbofan with interactive callouts, a specimen shipment record for the tracking demo,
+  and a dot-matrix US map with routes radiating from the Miami hub.
+- **Fast first paint** — every page is statically prerendered; the hero's entrance motion
+  is pure CSS so the headline paints before hydration.
 - **Complete conversion path** — service-specific CTAs deep-link to
   `/quote?service=aviation|freight|business` and preselect the matching service type.
 - **Accessible quote & contact forms** — React Hook Form + Zod, field-level errors,
@@ -38,7 +40,7 @@ This is a marketing + lead-gen site. The primary conversion action everywhere is
 
 | Layer     | Tech |
 |-----------|------|
-| Frontend  | React 18, Vite 5, TypeScript, Tailwind CSS 3, React Router 6, Three.js + @react-three/fiber + @react-three/drei, Framer Motion, React Hook Form + Zod, Axios |
+| Frontend  | Next.js 16 (App Router, Turbopack), React 19, TypeScript, Tailwind CSS 4, Motion, React Hook Form + Zod, Axios |
 | Backend   | Node.js 24, Express 4, TypeScript, **node:sqlite** (built-in), Zod, Helmet, CORS, express-rate-limit |
 
 ### Why `node:sqlite` instead of better-sqlite3?
@@ -55,22 +57,20 @@ behind `--experimental-sqlite`, which is already wired into the server's npm scr
 
 ```
 cargoflow/
-├── client/                     # React + Vite frontend (port 5173)
-│   ├── index.html              # SEO meta, Open Graph, JSON-LD, fonts
-│   ├── tailwind.config.js      # design tokens (ink / signal / steel, fonts)
-│   ├── vite.config.ts          # @ alias, /api dev proxy, 3D code-splitting
+├── client/                     # Next.js frontend (port 5173)
+│   ├── next.config.ts          # /api/* rewrite to the Express server
 │   ├── public/                 # favicon.svg, og-cover.svg
 │   └── src/
-│       ├── index.css           # design-system primitives (.btn/.card/.container-cf …)
-│       ├── lib/                # types.ts (API contract), api.ts (client), content.ts (copy)
-│       ├── components/
-│       │   ├── 3d/             # MiamiNetworkScene + SVG fallback (isolated)
-│       │   ├── home/           # Hero, Services, Aviation, Process, WhyCargoFlow, Technology, Network …
-│       │   ├── forms/          # QuoteForm, ContactForm
-│       │   └── shared/         # Navbar, Footer, SectionHeader, Reveal …
-│       ├── pages/              # Home, Quote, Contact, Aviation, Freight, BusinessShipping, About, Privacy, Terms, 404
-│       ├── layouts/            # MarketingLayout
-│       └── hooks/              # useDocumentMeta, useReducedMotion, useMediaQuery …
+│       ├── app/                # App Router: layout (fonts, metadata, JSON-LD), globals.css
+│       │                       # (design tokens + primitives), one folder per route, not-found
+│       ├── lib/                # types.ts (API contract), api.ts (client), content.ts (copy),
+│       │                       # usMap.ts (dot-map projection + routes)
+│       └── components/
+│           ├── site/           # SiteHeader, SiteFooter, PageHero, ServiceDetail, ClosingCTA …
+│           ├── home/           # Hero, SignArray, ServicesIndex, AviationFeature, ProcessRoute …
+│           ├── visuals/        # DepartureBoard, EngineBlueprint, SpecimenWaybill, NetworkMap
+│           ├── forms/          # QuoteForm, ContactForm, Field (waybill-style inputs)
+│           └── ui/             # Arrow, Logo, Reveal, SectionLabel
 │
 ├── server/                     # Express + TypeScript backend (port 3000)
 │   ├── .env.example
@@ -127,19 +127,32 @@ npm run dev
 
 - App: <http://localhost:5173>
 - Quote: <http://localhost:5173/quote>  ·  Contact: <http://localhost:5173/contact>
-- In dev, the frontend calls relative `/api/*`, which Vite proxies to the backend on
-  `:3000` — so start the backend too for form submissions to succeed.
+- The API (`/api/quotes`, `/api/contact`, `/api/health`) is built into the Next.js app as
+  route handlers in `client/src/app/api/`. No separate server is needed.
+- Leads are stored in Supabase Postgres (`POSTGRES_URL`). Without it, local dev falls back
+  to an in-memory store so the forms still work; production requires it.
+- The legacy Express server in `server/` is no longer used by the site.
 
 ### Frontend production build
 
 ```bash
 cd client
-npm run build      # tsc -b && vite build  ->  dist/
-npm run preview    # serve the built app
+npm run build      # next build -> .next/ (all routes prerendered as static)
+npm start          # serve the built app on :5173
 ```
 
-For a production build pointing at a hosted API, set `VITE_API_URL` in `client/.env`
-(e.g. `https://api.cargoflowgroup.com`).
+### Database (Supabase)
+
+```bash
+cd client
+vercel env pull .env.local --yes   # pulls POSTGRES_URL* from the Supabase integration
+node scripts/migrate.mjs           # applies supabase/migrations/*.sql (idempotent)
+```
+
+### Deploying
+
+Hosted on Vercel (project `cargoflowgroup`, root directory `client`). Pushing to `main`
+deploys production; `vercel deploy` from the repo root makes a preview.
 
 ---
 
@@ -158,7 +171,9 @@ For a production build pointing at a hosted API, set `VITE_API_URL` in `client/.
 
 | Var | Default | Purpose |
 |-----|---------|---------|
-| `VITE_API_URL` | *(empty)* | Empty in dev (use Vite proxy); set to the API base URL for prod builds |
+| `POSTGRES_URL` | *(set by the Supabase integration)* | Pooled Postgres connection used by the API routes |
+| `POSTGRES_URL_NON_POOLING` | *(set by the Supabase integration)* | Direct connection, used by `scripts/migrate.mjs` |
+| `NEXT_PUBLIC_API_URL` | *(empty)* | Optional — call the API at another base URL instead of same-origin `/api` |
 
 ---
 
@@ -190,7 +205,10 @@ illustrative demo/conceptual visuals, not live operational data.
 
 ## Accessibility & performance notes
 
-- Respects `prefers-reduced-motion` globally (scroll, parallax, camera, decorative motion).
-- Semantic headings, labeled controls, visible focus rings, accessible form validation.
-- 3D is code-split and lazy-loaded; `three`/`r3f` are isolated vendor chunks so they never
-  block first paint. Canvas DPR is capped and shadows/post-processing are off.
+- Respects `prefers-reduced-motion` globally: CSS animations collapse, Motion transforms
+  jump to their end state (`MotionConfig reducedMotion="user"`), the split-flap board and
+  map pulses render static.
+- Semantic headings, labeled controls, skip link, visible focus rings, accessible form
+  validation (first invalid field is focused; errors are announced).
+- No WebGL or 3D libraries; visuals are SVG/CSS. Scroll reveals have a `<noscript>`
+  fallback so content is visible without JavaScript.

@@ -1,17 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0A1220"/>
-      <stop offset="1" stop-color="#12233B"/>
-    </linearGradient>
+    <pattern id="hatch" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="14" height="28" fill="#0E0E0C"/>
+      <rect x="14" width="14" height="28" fill="#FFC629"/>
+    </pattern>
   </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <g stroke="#1B3355" stroke-width="1">
-    <path d="M0 158h1200M0 316h1200M0 474h1200M240 0v630M480 0v630M720 0v630M960 0v630"/>
+  <rect width="1200" height="630" fill="#F2F0E9"/>
+  <rect y="606" width="1200" height="24" fill="url(#hatch)"/>
+  <g transform="translate(80 80)">
+    <rect width="56" height="56" rx="5" fill="#FFC629"/>
+    <path d="M15.75 40.25 38.5 17.5M21 16.6h18.4V35" fill="none" stroke="#0E0E0C" stroke-width="6"/>
+    <text x="76" y="40" font-family="Archivo, Arial, sans-serif" font-size="30" font-weight="800" letter-spacing="1" fill="#0E0E0C">CARGOFLOW</text>
   </g>
-  <path d="M180 430 Q520 250 940 210" fill="none" stroke="#FF6A2C" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round"/>
-  <circle cx="180" cy="430" r="10" fill="#FF6A2C"/>
-  <circle cx="940" cy="210" r="8" fill="#7791B3"/>
-  <text x="90" y="300" font-family="'Space Grotesk',sans-serif" font-size="76" font-weight="700" fill="#FFFFFF">CargoFlow</text>
-  <text x="92" y="360" font-family="Inter,sans-serif" font-size="30" fill="#A3B6CE">Precision logistics. Miami based. Nationwide reach.</text>
+  <text x="76" y="330" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#0E0E0C">Precision logistics.</text>
+  <text x="76" y="450" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#8A867B">Delivered without</text>
+  <rect x="72" y="472" width="560" height="104" fill="#FFC629"/>
+  <text x="76" y="560" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#0E0E0C">compromise.</text>
+  <g transform="translate(860 80)">
+    <rect width="260" height="56" rx="4" fill="#0E0E0C"/>
+    <rect x="3" y="3" width="254" height="50" rx="3" fill="none" stroke="#FFC629" stroke-width="3"/>
+    <text x="130" y="37" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="18" font-weight="500" letter-spacing="3" fill="#FFC629">MIA · NORTH MIAMI</text>
+  </g>
 </svg>

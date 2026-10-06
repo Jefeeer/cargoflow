@@ -19,20 +19,18 @@ export interface NavItem {
   to: string;
 }
 
-/** Primary navigation. Section links use hash anchors on the home page. */
+/** Primary navigation. Home-page sections (#services, #why) are linked from the footer. */
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Services', to: '/#services' },
   { label: 'Aviation', to: '/aviation' },
   { label: 'Freight Forwarding', to: '/freight' },
   { label: 'Business Shipping', to: '/business-shipping' },
   { label: 'About', to: '/about' },
-  { label: 'Why CargoFlow', to: '/#why' },
   { label: 'Contact', to: '/contact' },
 ];
 
 export const HERO = {
   kicker: 'Miami-based logistics · National reach',
-  headline: ['Precision Logistics.', 'Delivered Without Compromise.'],
+  headline: ['Precision logistics.', 'Delivered without compromise.'],
   subhead:
     'CargoFlow provides reliable aviation parts transport, freight forwarding, and business shipping from Miami to destinations across the United States.',
   primaryCta: { label: 'Get a Free Quote', to: '/quote' },
@@ -65,6 +63,8 @@ export const POSITIONING = {
 
 export interface ServiceContent {
   key: ServiceKey;
+  /** Single-letter designator, rendered like an airfield taxiway sign. */
+  code: string;
   eyebrow: string;
   title: string;
   short: string;
@@ -77,6 +77,7 @@ export interface ServiceContent {
 export const SERVICES: ServiceContent[] = [
   {
     key: 'aviation',
+    code: 'A',
     eyebrow: 'Time-critical',
     title: 'Aviation Parts Transportation',
     short:
@@ -96,6 +97,7 @@ export const SERVICES: ServiceContent[] = [
   },
   {
     key: 'freight',
+    code: 'F',
     eyebrow: 'End-to-end',
     title: 'Freight Forwarding',
     short: 'Coordinated movement of goods from port to warehouse to carrier to final destination.',
@@ -114,6 +116,7 @@ export const SERVICES: ServiceContent[] = [
   },
   {
     key: 'business',
+    code: 'B',
     eyebrow: 'Local & interstate',
     title: 'Business Shipping Solutions',
     short:
@@ -135,7 +138,7 @@ export const SERVICES: ServiceContent[] = [
 
 export const AVIATION = {
   kicker: 'Aviation specialization',
-  headline: 'Built for Time-Critical Aviation Logistics',
+  headline: 'Built for time-critical aviation logistics.',
   body: 'Aircraft-related transportation is unlike generic local delivery. It demands precision, urgency, clear communication, careful handling, and reliable scheduling. CargoFlow is built around those demands.',
   requirements: [
     { title: 'Precision', body: 'Exacting handling for sensitive, high-value components.' },
@@ -215,7 +218,7 @@ export const WHY_CARGOFLOW: WhyItem[] = [
 
 export const TECHNOLOGY = {
   kicker: 'Technology',
-  headline: 'Visibility From Pickup to Delivery',
+  headline: 'Visibility from pickup to delivery.',
   body: 'Smart routing and shipment visibility help keep every shipment on track. The milestones below illustrate how a CargoFlow shipment could progress from quote to delivery.',
   milestones: [
     'Quote Confirmed',
@@ -254,12 +257,12 @@ export const ABOUT = {
 
 export const NETWORK = {
   kicker: 'Local expertise. National reach.',
-  headline: 'Miami Based. Nationwide Reach.',
+  headline: 'Miami based. Nationwide reach.',
   body: 'CargoFlow coordinates shipments from its South Florida hub to destinations across the United States. The network below is an illustrative visualization of that reach — not live operational data.',
 } as const;
 
 export const QUOTE_CTA = {
-  headline: 'Need to Move Something Important?',
+  headline: 'Need to move something important?',
   body: "Tell us what you're shipping, where it's going, and when it needs to arrive. CargoFlow will help determine the right logistics solution.",
   primaryCta: { label: 'Get a Free Quote', to: '/quote' },
   secondaryCta: { label: 'Contact CargoFlow', to: '/contact' },
@@ -300,3 +303,43 @@ export const QUOTE_SUCCESS =
   'Thank you. Your quote request has been received. The CargoFlow team will be able to review your shipment information.';
 
 export const CONTACT_SUCCESS = 'Thank you. Your message has been received.';
+
+/** What CargoFlow moves — drawn from the service descriptions above. Used in the cargo ticker. */
+export const CARGO_TYPES = [
+  'Aircraft parts',
+  'Engines',
+  'Specialized aviation equipment',
+  'Time-sensitive components',
+  'Retail inventory',
+  'Wholesale orders',
+  'Multi-location distribution',
+  'Recurring business shipments',
+] as const;
+
+export interface BoardRow {
+  ref: string;
+  to: string;
+  service: string;
+  status: string;
+}
+
+/**
+ * Sample departures board for the hero. Illustrative only — labelled as such on the page.
+ * Statuses step through BOARD_STATUSES, mirroring TECHNOLOGY.milestones.
+ */
+export const BOARD_ROWS: BoardRow[] = [
+  { ref: 'CF-A01', to: 'ATLANTA GA', service: 'AVIATION', status: 'IN TRANSIT' },
+  { ref: 'CF-F02', to: 'NEW YORK NY', service: 'FREIGHT', status: 'SCHEDULED' },
+  { ref: 'CF-B03', to: 'ORLANDO FL', service: 'BUSINESS', status: 'PICKED UP' },
+  { ref: 'CF-A04', to: 'DALLAS TX', service: 'AVIATION', status: 'PLANNING' },
+  { ref: 'CF-F05', to: 'CHICAGO IL', service: 'FREIGHT', status: 'DELIVERED' },
+];
+
+export const BOARD_STATUSES = [
+  'PLANNING',
+  'SCHEDULED',
+  'PICKED UP',
+  'IN TRANSIT',
+  'OUT FOR DLVY',
+  'DELIVERED',
+] as const;

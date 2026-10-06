@@ -1,25 +1,38 @@
 import { POSITIONING } from '@/lib/content';
-import { Reveal } from '@/components/shared/Reveal';
-import { SectionHeader } from '@/components/shared/SectionHeader';
+import { Reveal } from '@/components/ui/Reveal';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 
 export function Positioning() {
   return (
-    <section className="section bg-ink-950">
-      <div className="container-cf">
-        <Reveal>
-          <SectionHeader kicker={POSITIONING.kicker} heading={POSITIONING.heading} intro={POSITIONING.body} />
-        </Reveal>
+    <section className="py-24 sm:py-32">
+      <div className="shell">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+          <Reveal className="lg:col-span-3">
+            <SectionLabel index="01">{POSITIONING.kicker}</SectionLabel>
+          </Reveal>
+          <div className="lg:col-span-9">
+            <Reveal>
+              <h2 className="t-h2">
+                {POSITIONING.heading}
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink/75">{POSITIONING.body}</p>
+            </Reveal>
+          </div>
+        </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-20 grid grid-cols-1 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
           {POSITIONING.values.map((v, i) => (
-            <Reveal key={v.title} delay={i * 0.08}>
-              <div className="card h-full">
-                <h3 className="font-display text-lg text-white">{v.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-steel-300">{v.body}</p>
-              </div>
+            <Reveal key={v.title} delay={i * 0.08} className="border-t-2 border-ink pb-10 pt-5">
+              <dt className="flex items-baseline justify-between">
+                <span className="t-h3">{v.title}</span>
+                <span className="label text-mute">V.{i + 1}</span>
+              </dt>
+              <dd className="mt-3 max-w-xs leading-relaxed text-mute">{v.body}</dd>
             </Reveal>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

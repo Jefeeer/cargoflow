@@ -1,9 +1,13 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ApiError, submitContact } from '@/lib/api';
 import { CONTACT_SUCCESS } from '@/lib/content';
+import { Arrow } from '@/components/ui/Arrow';
+import { Field, ServerError, a11y } from './Field';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required.'),
@@ -15,11 +19,6 @@ const contactSchema = z.object({
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
-
-const fieldClass =
-  'w-full rounded-lg border border-steel-500/30 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-steel-500 focus:border-signal-400';
-const labelClass = 'mb-1.5 block text-sm font-medium text-steel-200';
-const errorClass = 'mt-1.5 text-sm text-signal-300';
 
 export function ContactForm() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -40,9 +39,10 @@ export function ContactForm() {
 
   if (submitted) {
     return (
-      <div className="card text-center" role="status">
-        <h3 className="text-2xl">Message Sent</h3>
-        <p className="mt-3 text-steel-300">{CONTACT_SUCCESS}</p>
+      <div role="status" className="bg-paper p-8 shadow-[inset_0_0_0_2px_var(--color-ink)] sm:p-12">
+        <p className="label text-mute">Message · Received</p>
+        <h2 className="t-h2 mt-4">Message sent.</h2>
+        <p className="mt-4 leading-relaxed text-ink/75">{CONTACT_SUCCESS}</p>
       </div>
     );
   }
@@ -66,73 +66,36 @@ export function ContactForm() {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-      {serverError && (
-        <p role="alert" className="rounded-lg border border-signal-500/40 bg-signal-500/10 px-4 py-3 text-sm text-signal-200">
-          {serverError}
-        </p>
-      )}
+  const e = errors;
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="name" className={labelClass}>Name *</label>
-          <input
-            id="name"
-            className={fieldClass}
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? 'name-error' : undefined}
-            {...register('name')}
-          />
-          {errors.name && <p id="name-error" role="alert" className={errorClass}>{errors.name.message}</p>}
-        </div>
-        <div>
-          <label htmlFor="company" className={labelClass}>Company</label>
-          <input id="company" className={fieldClass} {...register('company')} />
-        </div>
-        <div>
-          <label htmlFor="email" className={labelClass}>Email *</label>
-          <input
-            id="email"
-            type="email"
-            className={fieldClass}
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-            {...register('email')}
-          />
-          {errors.email && <p id="email-error" role="alert" className={errorClass}>{errors.email.message}</p>}
-        </div>
-        <div>
-          <label htmlFor="phone" className={labelClass}>Phone</label>
-          <input id="phone" type="tel" className={fieldClass} {...register('phone')} />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="subject" className={labelClass}>Subject *</label>
-          <input
-            id="subject"
-            className={fieldClass}
-            aria-invalid={!!errors.subject}
-            aria-describedby={errors.subject ? 'subject-error' : undefined}
-            {...register('subject')}
-          />
-          {errors.subject && <p id="subject-error" role="alert" className={errorClass}>{errors.subject.message}</p>}
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="message" className={labelClass}>Message *</label>
-          <textarea
-            id="message"
-            rows={5}
-            className={fieldClass}
-            aria-invalid={!!errors.message}
-            aria-describedby={errors.message ? 'message-error' : undefined}
-            {...register('message')}
-          />
-          {errors.message && <p id="message-error" role="alert" className={errorClass}>{errors.message.message}</p>}
-        </div>
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-8">
+      <ServerError message={serverError} />
+
+      <div className="waybill grid-cols-1 sm:grid-cols-2">
+        <Field id="name" label="Name" ref_="01" required error={e.name?.message}>
+          <input className="field-input" autoComplete="name" {...a11y('name', e.name?.message)} {...register('name')} />
+        </Field>
+        <Field id="company" label="Company" ref_="02">
+          <input id="company" className="field-input" autoComplete="organization" {...register('company')} />
+        </Field>
+        <Field id="email" label="Email" ref_="03" required error={e.email?.message}>
+          <input type="email" className="field-input" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
+        </Field>
+        <Field id="phone" label="Phone" ref_="04">
+          <input id="phone" type="tel" className="field-input" autoComplete="tel" {...register('phone')} />
+        </Field>
+        <Field id="subject" label="Subject" ref_="05" required error={e.subject?.message} className="sm:col-span-2">
+          <input className="field-input" {...a11y('subject', e.subject?.message)} {...register('subject')} />
+        </Field>
+        <Field id="message" label="Message" ref_="06" required error={e.message?.message} className="sm:col-span-2">
+          <textarea rows={6} className="field-input" {...a11y('message', e.message?.message)} {...register('message')} />
+        </Field>
       </div>
 
-      <button type="submit" className="btn-primary btn-lg w-full sm:w-auto" disabled={isSubmitting}>
-        {isSubmitting ? 'Sending...' : 'Send Message'}
+      <button type="submit" className="btn btn-ink min-h-14 w-full px-8 text-base sm:w-auto" disabled={isSubmitting}>
+        {isSubmitting ? 'Sending…' : 'Send message'}
+        <Arrow className="arrow" />
       </button>
     </form>
   );

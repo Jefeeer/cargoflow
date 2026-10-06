@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSearchParams } from 'react-router-dom';
-import { submitQuote } from '@/lib/api';
-import { ApiError } from '@/lib/api';
+import { useSearchParams } from 'next/navigation';
+import { ApiError, submitQuote } from '@/lib/api';
 import { SERVICE_OPTIONS, serviceLabelFromKey } from '@/lib/types';
 import { QUOTE_SUCCESS } from '@/lib/content';
+import { Arrow } from '@/components/ui/Arrow';
+import { Field, FormSection, ServerError, a11y } from './Field';
 
 const quoteSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required.'),
@@ -30,17 +33,11 @@ const quoteSchema = z.object({
 
 type QuoteFormValues = z.infer<typeof quoteSchema>;
 
-const fieldClass =
-  'w-full rounded-lg border border-steel-500/30 bg-ink-900/60 px-4 py-2.5 text-sm text-white placeholder:text-steel-500 focus:border-signal-400';
-const labelClass = 'mb-1.5 block text-sm font-medium text-steel-200';
-const errorClass = 'mt-1.5 text-sm text-signal-300';
-
 export function QuoteForm() {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const preselect = serviceLabelFromKey(searchParams.get('service'));
   const [serverError, setServerError] = useState<string | null>(null);
   const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     register,
@@ -61,12 +58,14 @@ export function QuoteForm() {
 
   if (referenceNumber) {
     return (
-      <div className="card text-center" role="status">
-        <h3 className="text-2xl">Quote Request Received</h3>
-        <p className="mt-3 text-steel-300">{QUOTE_SUCCESS}</p>
-        <p className="mt-4 font-mono text-sm text-signal-300">
-          Reference number: <span className="font-semibold">{referenceNumber}</span>
-        </p>
+      <div role="status" className="relative overflow-hidden bg-paper p-8 shadow-[inset_0_0_0_2px_var(--color-ink)] sm:p-12">
+        <p className="label text-mute">Quote request · Received</p>
+        <h2 className="t-h2 mt-4">Quote request received.</h2>
+        <p className="mt-4 max-w-lg leading-relaxed text-ink/75">{QUOTE_SUCCESS}</p>
+        <div className="mt-8 inline-flex flex-col bg-ink px-5 py-4 text-paper">
+          <span className="label text-paper/50">Reference number</span>
+          <span className="mt-1 font-mono text-2xl tracking-wider text-sign">{referenceNumber}</span>
+        </div>
       </div>
     );
   }
@@ -90,72 +89,33 @@ export function QuoteForm() {
     }
   };
 
+  const e = errors;
+
   return (
-    <form ref={formRef} onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-10">
-      {serverError && (
-        <p role="alert" className="rounded-lg border border-signal-500/40 bg-signal-500/10 px-4 py-3 text-sm text-signal-200">
-          {serverError}
-        </p>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-12">
+      <ServerError message={serverError} />
 
-      <fieldset>
-        <legend className="mb-5 font-display text-lg text-white">Contact Information</legend>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="fullName" className={labelClass}>Full Name *</label>
-            <input
-              id="fullName"
-              className={fieldClass}
-              aria-invalid={!!errors.fullName}
-              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
-              {...register('fullName')}
-            />
-            {errors.fullName && <p id="fullName-error" role="alert" className={errorClass}>{errors.fullName.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="companyName" className={labelClass}>Company Name</label>
-            <input id="companyName" className={fieldClass} {...register('companyName')} />
-          </div>
-          <div>
-            <label htmlFor="email" className={labelClass}>Email *</label>
-            <input
-              id="email"
-              type="email"
-              className={fieldClass}
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? 'email-error' : undefined}
-              {...register('email')}
-            />
-            {errors.email && <p id="email-error" role="alert" className={errorClass}>{errors.email.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="phone" className={labelClass}>Phone *</label>
-            <input
-              id="phone"
-              type="tel"
-              className={fieldClass}
-              aria-invalid={!!errors.phone}
-              aria-describedby={errors.phone ? 'phone-error' : undefined}
-              {...register('phone')}
-            />
-            {errors.phone && <p id="phone-error" role="alert" className={errorClass}>{errors.phone.message}</p>}
-          </div>
+      <FormSection index="01" title="Contact information">
+        <div className="waybill grid-cols-1 sm:grid-cols-2">
+          <Field id="fullName" label="Full name" ref_="1a" required error={e.fullName?.message}>
+            <input className="field-input" autoComplete="name" {...a11y('fullName', e.fullName?.message)} {...register('fullName')} />
+          </Field>
+          <Field id="companyName" label="Company name" ref_="1b">
+            <input className="field-input" autoComplete="organization" id="companyName" {...register('companyName')} />
+          </Field>
+          <Field id="email" label="Email" ref_="1c" required error={e.email?.message}>
+            <input type="email" className="field-input" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
+          </Field>
+          <Field id="phone" label="Phone" ref_="1d" required error={e.phone?.message}>
+            <input type="tel" className="field-input" autoComplete="tel" {...a11y('phone', e.phone?.message)} {...register('phone')} />
+          </Field>
         </div>
-      </fieldset>
+      </FormSection>
 
-      <fieldset>
-        <legend className="mb-5 font-display text-lg text-white">Shipment Details</legend>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="serviceType" className={labelClass}>Service Type *</label>
-            <select
-              id="serviceType"
-              className={fieldClass}
-              aria-invalid={!!errors.serviceType}
-              aria-describedby={errors.serviceType ? 'serviceType-error' : undefined}
-              defaultValue={preselect ?? ''}
-              {...register('serviceType')}
-            >
+      <FormSection index="02" title="Shipment details">
+        <div className="waybill grid-cols-1 sm:grid-cols-2">
+          <Field id="serviceType" label="Service type" ref_="2a" required error={e.serviceType?.message}>
+            <select className="field-input" {...a11y('serviceType', e.serviceType?.message)} {...register('serviceType')}>
               <option value="" disabled>
                 Select a service
               </option>
@@ -165,97 +125,90 @@ export function QuoteForm() {
                 </option>
               ))}
             </select>
-            {errors.serviceType && (
-              <p id="serviceType-error" role="alert" className={errorClass}>{errors.serviceType.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="cargoDescription" className={labelClass}>Cargo Description *</label>
+          </Field>
+          <Field id="cargoDescription" label="Cargo description" ref_="2b" required error={e.cargoDescription?.message}>
             <input
-              id="cargoDescription"
-              className={fieldClass}
-              aria-invalid={!!errors.cargoDescription}
-              aria-describedby={errors.cargoDescription ? 'cargoDescription-error' : undefined}
+              className="field-input"
+              placeholder="e.g. Landing gear actuator, crated"
+              {...a11y('cargoDescription', e.cargoDescription?.message)}
               {...register('cargoDescription')}
             />
-            {errors.cargoDescription && (
-              <p id="cargoDescription-error" role="alert" className={errorClass}>{errors.cargoDescription.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="origin" className={labelClass}>Origin *</label>
+          </Field>
+          <Field id="origin" label="Origin" ref_="2c" required error={e.origin?.message}>
+            <input className="field-input" placeholder="City, State" {...a11y('origin', e.origin?.message)} {...register('origin')} />
+          </Field>
+          <Field id="destination" label="Destination" ref_="2d" required error={e.destination?.message}>
             <input
-              id="origin"
-              className={fieldClass}
-              aria-invalid={!!errors.origin}
-              aria-describedby={errors.origin ? 'origin-error' : undefined}
-              {...register('origin')}
-            />
-            {errors.origin && <p id="origin-error" role="alert" className={errorClass}>{errors.origin.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="destination" className={labelClass}>Destination *</label>
-            <input
-              id="destination"
-              className={fieldClass}
-              aria-invalid={!!errors.destination}
-              aria-describedby={errors.destination ? 'destination-error' : undefined}
+              className="field-input"
+              placeholder="City, State"
+              {...a11y('destination', e.destination?.message)}
               {...register('destination')}
             />
-            {errors.destination && (
-              <p id="destination-error" role="alert" className={errorClass}>{errors.destination.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="pickupDate" className={labelClass}>Pickup Date</label>
-            <input id="pickupDate" type="date" className={fieldClass} {...register('pickupDate')} />
-          </div>
-          <div>
-            <label htmlFor="requestedDeliveryDate" className={labelClass}>Requested Delivery Date</label>
-            <input id="requestedDeliveryDate" type="date" className={fieldClass} {...register('requestedDeliveryDate')} />
-          </div>
-          <div>
-            <label htmlFor="approximateWeight" className={labelClass}>Approximate Weight</label>
-            <input id="approximateWeight" className={fieldClass} placeholder="e.g. 450 lbs" {...register('approximateWeight')} />
-          </div>
-          <div>
-            <label htmlFor="pieces" className={labelClass}>Number of Pieces / Pallets</label>
-            <input id="pieces" className={fieldClass} {...register('pieces')} />
-          </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="specialHandlingRequirements" className={labelClass}>Special Handling Requirements</label>
-            <input id="specialHandlingRequirements" className={fieldClass} {...register('specialHandlingRequirements')} />
-          </div>
+          </Field>
+          <Field id="pickupDate" label="Pickup date" ref_="2e">
+            <input id="pickupDate" type="date" className="field-input" {...register('pickupDate')} />
+          </Field>
+          <Field id="requestedDeliveryDate" label="Requested delivery" ref_="2f">
+            <input id="requestedDeliveryDate" type="date" className="field-input" {...register('requestedDeliveryDate')} />
+          </Field>
+          <Field id="approximateWeight" label="Approx. weight" ref_="2g">
+            <input id="approximateWeight" className="field-input" placeholder="e.g. 450 lbs" {...register('approximateWeight')} />
+          </Field>
+          <Field id="pieces" label="Pieces / pallets" ref_="2h">
+            <input id="pieces" className="field-input" placeholder="e.g. 2 crates" {...register('pieces')} />
+          </Field>
+          <Field id="specialHandlingRequirements" label="Special handling requirements" ref_="2i" className="sm:col-span-2">
+            <input
+              id="specialHandlingRequirements"
+              className="field-input"
+              placeholder="Fragile, temperature, liftgate, hazmat classification…"
+              {...register('specialHandlingRequirements')}
+            />
+          </Field>
         </div>
-      </fieldset>
+      </FormSection>
 
-      <div>
-        <label htmlFor="additionalNotes" className={labelClass}>Tell Us More About Your Shipment</label>
-        <textarea id="additionalNotes" rows={4} className={fieldClass} {...register('additionalNotes')} />
-      </div>
+      <FormSection index="03" title="Anything else">
+        <div className="waybill grid-cols-1">
+          <Field id="additionalNotes" label="Tell us more about your shipment" ref_="3a">
+            <textarea id="additionalNotes" rows={4} className="field-input" {...register('additionalNotes')} />
+          </Field>
+        </div>
+      </FormSection>
 
-      <div>
-        <div className="flex items-start gap-3">
-          <input
-            id="consentToContact"
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-steel-500/40 bg-ink-900 text-signal-500 focus:ring-signal-400"
-            aria-invalid={!!errors.consentToContact}
-            aria-describedby={errors.consentToContact ? 'consent-error' : undefined}
-            {...register('consentToContact')}
-          />
-          <label htmlFor="consentToContact" className="text-sm text-steel-300">
-            I agree to be contacted regarding this quote request. *
+      <div className="flex flex-col gap-8 border-t-2 border-ink pt-8 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <label htmlFor="consentToContact" className="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              className="peer sr-only"
+              {...a11y('consentToContact', e.consentToContact?.message)}
+              {...register('consentToContact')}
+            />
+            <span
+              aria-hidden="true"
+              className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center border-2 border-ink text-transparent peer-checked:bg-ink peer-checked:text-sign peer-focus-visible:shadow-[0_0_0_4px_var(--color-sign)]"
+            >
+              <svg viewBox="0 0 10 10" className="h-3 w-3">
+                <path d="M1.5 5.5 4 8l4.5-6" fill="none" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            </span>
+            <span className="max-w-md text-[0.9375rem] leading-snug">
+              I agree to be contacted regarding this quote request. <span aria-hidden="true">*</span>
+            </span>
           </label>
+          {e.consentToContact && (
+            <p id="consentToContact-error" role="alert" className="field-error ml-8">
+              {e.consentToContact.message}
+            </p>
+          )}
         </div>
-        {errors.consentToContact && (
-          <p id="consent-error" role="alert" className={errorClass}>{errors.consentToContact.message}</p>
-        )}
-      </div>
 
-      <button type="submit" className="btn-primary btn-lg w-full sm:w-auto" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Request My Quote'}
-      </button>
+        <button type="submit" className="btn btn-ink min-h-14 px-8 text-base" disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting…' : 'Request my quote'}
+          <Arrow className="arrow" />
+        </button>
+      </div>
     </form>
   );
 }
