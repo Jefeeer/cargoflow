@@ -98,16 +98,16 @@ export function QuoteForm() {
       <FormSection index="01" title="Contact information">
         <div className="waybill grid-cols-1 sm:grid-cols-2">
           <Field id="fullName" label="Full name" ref_="1a" required error={e.fullName?.message}>
-            <input className="field-input" autoComplete="name" {...a11y('fullName', e.fullName?.message)} {...register('fullName')} />
+            <input className="field-input" autoComplete="name" placeholder="Jane Rivera" {...a11y('fullName', e.fullName?.message)} {...register('fullName')} />
           </Field>
           <Field id="companyName" label="Company name" ref_="1b">
-            <input className="field-input" autoComplete="organization" id="companyName" {...register('companyName')} />
+            <input className="field-input" autoComplete="organization" placeholder="Acme Aerospace" id="companyName" {...register('companyName')} />
           </Field>
           <Field id="email" label="Email" ref_="1c" required error={e.email?.message}>
-            <input type="email" className="field-input" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
+            <input type="email" className="field-input" placeholder="you@company.com" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
           </Field>
           <Field id="phone" label="Phone" ref_="1d" required error={e.phone?.message}>
-            <input type="tel" className="field-input" autoComplete="tel" {...a11y('phone', e.phone?.message)} {...register('phone')} />
+            <input type="tel" className="field-input" placeholder="(305) 555-0123" autoComplete="tel" {...a11y('phone', e.phone?.message)} {...register('phone')} />
           </Field>
         </div>
       </FormSection>
@@ -171,7 +171,7 @@ export function QuoteForm() {
       <FormSection index="03" title="Anything else">
         <div className="waybill grid-cols-1">
           <Field id="additionalNotes" label="Tell us more about your shipment" ref_="3a">
-            <textarea id="additionalNotes" rows={4} className="field-input" {...register('additionalNotes')} />
+            <textarea id="additionalNotes" rows={4} className="field-input" placeholder="Deadlines, dimensions, customs paperwork, or anything else we should know…" {...register('additionalNotes')} />
           </Field>
         </div>
       </FormSection>

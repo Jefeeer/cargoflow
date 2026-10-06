@@ -12,6 +12,8 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [menuTop, setMenuTop] = useState(0);
+  const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -29,6 +31,11 @@ export function SiteHeader() {
     if (!open) return;
     const menu = menuRef.current;
     if (!menu) return;
+    // The header is sticky but sits below the utility bar until scrolled, so
+    // anchor the menu to its real bottom edge rather than a fixed offset.
+    const placeMenu = () => setMenuTop(headerRef.current?.getBoundingClientRect().bottom ?? 0);
+    placeMenu();
+    window.addEventListener('resize', placeMenu);
     document.body.style.overflow = 'hidden';
     const focusables = menu.querySelectorAll<HTMLElement>('a, button');
     focusables[0]?.focus();
@@ -53,6 +60,7 @@ export function SiteHeader() {
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('resize', placeMenu);
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [open]);
@@ -76,9 +84,16 @@ export function SiteHeader() {
         </div>
       </div>
 
+      {/* No backdrop-filter while the menu is open: it would make the header the
+          containing block for the fixed menu and collapse it to zero height. */}
       <header
+        ref={headerRef}
         className={`sticky top-0 z-50 transition-[background-color,box-shadow] duration-300 ${
-          scrolled || open ? 'bg-paper/90 shadow-[0_1px_0_var(--rule)] backdrop-blur-md' : 'bg-paper'
+          open
+            ? 'bg-paper shadow-[0_1px_0_var(--rule)]'
+            : scrolled
+              ? 'bg-paper/90 shadow-[0_1px_0_var(--rule)] backdrop-blur-md'
+              : 'bg-paper'
         }`}
       >
         <nav className="shell flex h-[4.5rem] items-center justify-between gap-8" aria-label="Primary">
@@ -132,7 +147,8 @@ export function SiteHeader() {
           <div
             id="mobile-menu"
             ref={menuRef}
-            className="fixed inset-x-0 bottom-0 top-[4.5rem] overflow-y-auto bg-ink text-paper lg:hidden"
+            style={{ top: menuTop }}
+            className="fixed inset-x-0 bottom-0 overflow-y-auto bg-ink text-paper lg:hidden"
           >
             <ul className="shell flex flex-col py-6">
               {NAV_ITEMS.map((item, i) => (

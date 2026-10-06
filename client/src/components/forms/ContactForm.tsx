@@ -74,22 +74,22 @@ export function ContactForm() {
 
       <div className="waybill grid-cols-1 sm:grid-cols-2">
         <Field id="name" label="Name" ref_="01" required error={e.name?.message}>
-          <input className="field-input" autoComplete="name" {...a11y('name', e.name?.message)} {...register('name')} />
+          <input className="field-input" autoComplete="name" placeholder="Jane Rivera" {...a11y('name', e.name?.message)} {...register('name')} />
         </Field>
         <Field id="company" label="Company" ref_="02">
-          <input id="company" className="field-input" autoComplete="organization" {...register('company')} />
+          <input id="company" className="field-input" placeholder="Acme Aerospace" autoComplete="organization" {...register('company')} />
         </Field>
         <Field id="email" label="Email" ref_="03" required error={e.email?.message}>
-          <input type="email" className="field-input" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
+          <input type="email" className="field-input" placeholder="you@company.com" autoComplete="email" {...a11y('email', e.email?.message)} {...register('email')} />
         </Field>
         <Field id="phone" label="Phone" ref_="04">
-          <input id="phone" type="tel" className="field-input" autoComplete="tel" {...register('phone')} />
+          <input id="phone" type="tel" className="field-input" placeholder="(305) 555-0123" autoComplete="tel" {...register('phone')} />
         </Field>
         <Field id="subject" label="Subject" ref_="05" required error={e.subject?.message} className="sm:col-span-2">
-          <input className="field-input" {...a11y('subject', e.subject?.message)} {...register('subject')} />
+          <input className="field-input" placeholder="What can we help with?" {...a11y('subject', e.subject?.message)} {...register('subject')} />
         </Field>
         <Field id="message" label="Message" ref_="06" required error={e.message?.message} className="sm:col-span-2">
-          <textarea rows={6} className="field-input" {...a11y('message', e.message?.message)} {...register('message')} />
+          <textarea rows={6} className="field-input" placeholder="Tell us about your shipment, timeline, or question…" {...a11y('message', e.message?.message)} {...register('message')} />
         </Field>
       </div>
 
