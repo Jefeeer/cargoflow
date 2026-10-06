@@ -1,6 +1,8 @@
 import 'server-only';
 import type { ZodError } from 'zod';
 import type { ApiErrorResponse } from '@/lib/types';
+import { COMPANY } from '@/lib/content';
+import { DatabaseNotConfiguredError } from './db';
 
 export function json<T>(body: T, status = 200) {
   return Response.json(body, { status });
@@ -22,6 +24,16 @@ export function validationError(error: ZodError) {
 
 export function serverError(err: unknown) {
   console.error(err);
+  // No database connected yet: never pretend a lead was saved — point people to email.
+  if (err instanceof DatabaseNotConfiguredError) {
+    return json<ApiErrorResponse>(
+      {
+        success: false,
+        error: `Online requests are temporarily unavailable. Please email us at ${COMPANY.email} and we'll get back to you.`,
+      },
+      503,
+    );
+  }
   return json<ApiErrorResponse>({ success: false, error: 'Internal server error.' }, 500);
 }
 

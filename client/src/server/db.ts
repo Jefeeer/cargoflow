@@ -12,6 +12,14 @@ type Sql = ReturnType<typeof postgres>;
 
 let client: Sql | null = null;
 
+/** Thrown in production when no database is connected, so routes can answer honestly. */
+export class DatabaseNotConfiguredError extends Error {
+  constructor() {
+    super('POSTGRES_URL is not set — connect the Supabase integration to this project.');
+    this.name = 'DatabaseNotConfiguredError';
+  }
+}
+
 function connectionString(): string | undefined {
   return process.env.POSTGRES_URL?.trim() || process.env.DATABASE_URL?.trim() || undefined;
 }
@@ -20,9 +28,7 @@ function connectionString(): string | undefined {
 function getSql(): Sql | null {
   const url = connectionString();
   if (!url) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('POSTGRES_URL is not set — connect the Supabase integration to this project.');
-    }
+    if (process.env.NODE_ENV === 'production') throw new DatabaseNotConfiguredError();
     return null;
   }
   // prepare: false — Supabase's pooler runs in transaction mode, which can't hold prepared statements.
