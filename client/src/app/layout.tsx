@@ -20,7 +20,10 @@ const plexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
-const SITE_URL = 'https://cargoflowgroup.com';
+// Must be a domain this site is actually served from: link previews (Messenger, Facebook,
+// iMessage) follow og:url / canonical and open that address. Set NEXT_PUBLIC_SITE_URL
+// once a custom domain is attached in Vercel.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cargoflowgroup.vercel.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -35,17 +38,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'CargoFlow',
-    url: SITE_URL,
     title: 'CargoFlow | Precision Logistics from Miami, Nationwide',
     description:
       'Reliable aviation parts transport, freight forwarding, and business shipping from Miami to destinations across the United States.',
-    images: ['/og-cover.svg'],
+    // Facebook/Messenger don't render SVG previews, so serve a PNG.
+    images: [{ url: '/og-cover.png', width: 1200, height: 630, alt: 'CargoFlow — Precision logistics. Delivered without compromise.' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CargoFlow | Precision Logistics from Miami, Nationwide',
     description: 'Aviation parts, freight forwarding, and business shipping. Local Miami expertise. National reach.',
-    images: ['/og-cover.svg'],
+    images: ['/og-cover.png'],
   },
 };
 

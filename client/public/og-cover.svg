@@ -14,7 +14,7 @@
   </g>
   <text x="76" y="330" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#0E0E0C">Precision logistics.</text>
   <text x="76" y="450" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#8A867B">Delivered without</text>
-  <rect x="72" y="472" width="560" height="104" fill="#FFC629"/>
+  <rect x="72" y="472" width="620" height="104" fill="#FFC629"/>
   <text x="76" y="560" font-family="Archivo, Arial, sans-serif" font-size="112" font-weight="600" letter-spacing="-4" fill="#0E0E0C">compromise.</text>
   <g transform="translate(860 80)">
     <rect width="260" height="56" rx="4" fill="#0E0E0C"/>
